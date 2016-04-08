@@ -16,6 +16,11 @@ type Connection struct{
 
 /*
   Connect to a gearman server
+
+  ie: 
+ 
+  gma, err := gearman_admin.Connect("tcp", "10.0.50.3:4730")
+
 */
 func Connect( network, address string)( connection *Connection, err error ){
 	connection = &Connection{}

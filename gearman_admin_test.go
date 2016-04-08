@@ -4,6 +4,9 @@ import (
 	"testing"
 	"strings"
 	"reflect"
+	"net"
+	"bufio"
+	"log"
 )
 
 const read_until_stop_data = `
@@ -84,3 +87,103 @@ func TestWorkersFromLines( t *testing.T ){
 	}
 }
 
+func TestOverTCPErr ( t * testing.T){
+	l, err := net.Listen("tcp","127.0.0.1:0")
+	if err != nil {
+		t.Error( err )
+	}
+	addr := l.Addr().String()
+	w, err := Connect("tcp", addr)
+	if err != nil {
+		t.Error("Failed to connect " + err.Error() )
+	}
+	if w == nil {
+		t.Error("Connecting gave a null connection")
+	}
+	con, err := l.Accept()
+	if err != nil {
+		t.Error( err )
+	}
+//	wesent := make( chan string )
+	go func(){
+		_, err := bufio.NewReader(con).ReadString('\n')
+		if err != nil {
+			panic(err)
+		}
+		out := bufio.NewWriter(con)
+		out.WriteString("33 127.0.0.1 - : green blue\n")
+		//out.WriteString(".\n")
+		con.Close()
+	//	wesent <- in
+
+	}()
+
+	_, err /*:*/= w.Workers()
+	if err == nil {
+		t.Error("No EOF error")
+	}
+	if err != nil && err.Error() != "EOF" {
+		t.Error("Non EOF error")
+	}
+/*	s := <- wesent
+	if s != "workersyo\n" {
+		t.Error("We sent: " + s , "  expected \"workers\\n\"") 
+	}*/
+	
+}
+
+func TestOverTCPWorkers ( t * testing.T){
+	l, err := net.Listen("tcp","127.0.0.1:0")
+	if err != nil {
+		t.Error( err )
+	}
+	addr := l.Addr().String()
+	w, err := Connect("tcp", addr)
+	if err != nil {
+		t.Error("Failed to connect " + err.Error() )
+	}
+	if w == nil {
+		t.Error("Connecting gave a null connection")
+	}
+	con, err := l.Accept()
+	if err != nil {
+		t.Error( err )
+	}
+	wesent := make( chan string )
+	go func(){
+		in, err := bufio.NewReader(con).ReadString('\n')
+		log.Println(in)
+		if err != nil {
+			panic(err)
+		}
+		out := bufio.NewWriter(con)
+		out.WriteString("33 127.0.0.1 - : green blue\n")
+		out.WriteString(".\n")
+		out.Flush()
+		con.Close()
+		wesent <- in
+
+	}()
+
+	workers, err := w.Workers()
+	if err != nil {
+		t.Error("Unexpected error: " + err.Error())
+	}
+
+	s := <- wesent
+	if s != "workers\n" {
+		t.Error("We sent: " + s , "  expected \"workers\\n\"") 
+	}
+	
+	if len(workers) != 1 {
+		t.Error("Expected one worker")
+	}
+	worker := workers[0];
+	if worker.Fd != "33" {
+		t.Error("worker.Fd")
+	}
+	if worker.Addr != "127.0.0.1" {
+		t.Error("worker.Addr")
+	}
+	
+}
