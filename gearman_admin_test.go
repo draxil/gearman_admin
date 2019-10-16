@@ -2,7 +2,7 @@ package gearman_admin
 
 import (
 	"bufio"
-	"log"
+	_ "log"
 	"net"
 	"reflect"
 	"strconv"
@@ -29,6 +29,29 @@ func TestReadUntilStop(t *testing.T) {
 		t.Error("Unexpected response from read_until_stop : ", list)
 	}
 
+}
+
+func TestProcessLine(t * testing.T){
+	in := []string{
+		"1 2 3 4",
+		"1  2  3  4",
+		"1	2	3	4",
+		"1234",
+	}
+	expect := [][]string{
+		[]string{"1","2","3","4"},
+		[]string{"1","2","3","4"},
+		[]string{"1","2","3","4"},
+		[]string{"1234"},
+	}
+	for i := range(expect) {
+		res := process_line(in[i])
+		for j, v := range(expect[i]) {
+			if res[j] != v {
+				t.Error("Bad result for row:",i, " col:", j, " expected: ", v, " got ", res[j])
+			}
+		}
+	}
 }
 
 func TestFuncStatusesFromLines(t *testing.T) {
@@ -229,7 +252,6 @@ func TestOverTCPWorkers(t *testing.T) {
 	wesent := make(chan string)
 	go func() {
 		in, err := bufio.NewReader(con).ReadString('\n')
-		log.Println(in)
 		if err != nil {
 			panic(err)
 		}
@@ -285,7 +307,6 @@ func TestOverTCPStatus(t *testing.T) {
 	wesent := make(chan string)
 	go func() {
 		in, err := bufio.NewReader(con).ReadString('\n')
-		log.Println(in)
 		if err != nil {
 			panic(err)
 		}

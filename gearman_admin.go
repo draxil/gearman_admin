@@ -7,6 +7,7 @@ import (
 	"net"
 	"strings"
 	"strconv"
+	"regexp"
 )
 
 /*
@@ -14,6 +15,11 @@ import (
 */
 type Connection struct {
 	net.Conn
+}
+var colrx  *regexp.Regexp
+
+func init(){
+	colrx = regexp.MustCompile("[ \t]+")
 }
 
 /*
@@ -90,7 +96,8 @@ func (c *Connection) Status() (statuses []FunctionStatus, err error) {
 
 func process_line( line string ) []string{
 	trimmed_line := strings.TrimRight(line, "\n")
-	parts := strings.Split(trimmed_line, " ")
+	//parts := strings.Split(trimmed_line, " ")
+	parts := colrx.Split(trimmed_line, -1)
 	return parts
 }
 func func_statuses_from_lines(lines []string) (funcs []FunctionStatus, err error){
