@@ -18,5 +18,7 @@ So far can be used to check workers (useful to check your worker processes are u
   }
 ```
 
+See the [godoc](https://godoc.org/github.com/draxil/gearman_admin) for full details of what is available.
+
 [![Build Status](https://travis-ci.org/draxil/gearman_admin.png?branch=master)](https://travis-ci.org/draxil/gearman_admin)
 [![GoDoc](https://godoc.org/github.com/draxil/gearman_admin?status.png)](https://godoc.org/github.com/draxil/gearman_admin)
