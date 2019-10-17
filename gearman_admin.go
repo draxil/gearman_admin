@@ -178,13 +178,6 @@ func workers_from_lines(lines []string) (workers []Worker, err error) {
 }
 
 
-type FunctionStatus struct {
-	Name string /* Function name */
-	UnfinishedJobs int /* Number of unfinished jobs */
-	RunningJobs int /* Number of running jobs */
-	Workers int /* Number of workers available */
-}
-
 /*
    Decoded description of a gearman worker
 */
@@ -227,6 +220,17 @@ func read_until_stop(r io.Reader) (lines []string, err error) {
 
 	return
 }
+
+/* 
+  Decoded description of a functions current status
+*/
+type FunctionStatus struct {
+	Name string /* Function name */
+	UnfinishedJobs int /* Number of unfinished jobs */
+	RunningJobs int /* Number of running jobs */
+	Workers int /* Number of workers available */
+}
+
 
 /*
    Some kind of protocol error
