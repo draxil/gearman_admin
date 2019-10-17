@@ -5,7 +5,7 @@ Gearman admin protocol client for go / golang. Can be used to check on a gearman
 
 So far can be used to check workers (useful to check your worker processes are up) and on functions & jobs (good to catch a bottleneck or failure):
 ```
- 	gma, err := gearman_admin.Connect("tcp", "10.0.50.17:4730")
+  gma, err := gearman_admin.Connect("tcp", "10.0.50.17:4730")
   
   workers, err := gma.Workers()
   for _, worker := range(workers) {
